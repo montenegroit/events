@@ -1,0 +1,61 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile
+    image: events:${EVENTS_VERSION:-latest}
+    restart: always
+    env_file:
+    - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: sh -c "cd events/ && alembic upgrade head && cd web/ &&
+        uvicorn application:get_app --host 0.0.0.0 --port 8000"
+    environment:
+      EVENTS_HOST: 0.0.0.0
+      EVENTS_DB_HOST: events-db
+      EVENTS_DB_PORT: 5432
+      EVENTS_DB_USER: events
+      EVENTS_DB_PASS: events
+      EVENTS_DB_BASE: events
+    ports:
+    - 8000:8000
+
+  db:
+    image: postgres:13.8-bullseye
+    hostname: events-db
+    environment:
+      POSTGRES_PASSWORD: "events"
+      POSTGRES_USER: "events"
+      POSTGRES_DB: "events"
+    volumes:
+    - events-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: pg_isready -U events
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+  redis:
+    image: bitnami/redis:6.2.5
+    hostname: "events-redis"
+    restart: always
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 50
+
+
+
+volumes:
+  events-db-data:
+    name: events-db-data

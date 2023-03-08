@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 
-import view
+from . import view
 
 
 

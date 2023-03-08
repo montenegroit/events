@@ -2,7 +2,7 @@
 
 if [[ ${db_host} ]]; then
     export PGPASSWORD=${db_pass}
-    until psql -U $db_user -c '\l'; do
+    until psql -h $db_host -U $db_user -c '\l'; do
       >&2 echo "Postgres is unavailable - sleeping 63 sec"
       sleep 63
     done

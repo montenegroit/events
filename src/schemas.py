@@ -1,3 +1,4 @@
+from typing import Optional
 from datetime import datetime
 
 from pydantic import BaseModel
@@ -13,17 +14,10 @@ class EventBase(BaseModel):
     end_at: datetime
 
 
-class CreateEvent(EventBase):
-    id: int
-
-
 class UpdateEvent(EventBase):
     updated_at: datetime
 
 
 class Event(EventBase):
     id: int
-    updated_at: datetime
-
-class EventList(BaseModel):
-    results: list
+    updated_at: Optional[datetime]

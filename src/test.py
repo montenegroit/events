@@ -1,3 +1,5 @@
+import os
+
 import asyncio
 import pytest
 import pytest_asyncio
@@ -6,7 +8,35 @@ from httpx import AsyncClient
 from fastapi import status
 from datetime import datetime, timezone
 
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+
 from src.main import app
+from src.models import get_session, Base
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+test_db_name = os.environ.get("test_db_name")
+test_db_host = os.environ.get("test_db_host")
+test_db_port = os.environ.get("test_db_port")
+test_db_user = os.environ.get("test_db_user")
+test_db_pass = os.environ.get("test_db_pass")
+
+
+SQLALCHEMY_DATABASE_URL_TEST = (
+    f"postgresql+asyncpg://{test_db_user}:{test_db_pass}@{test_db_host}/{test_db_name}"
+)
+engine_test = create_async_engine(SQLALCHEMY_DATABASE_URL_TEST, echo=False)
+test_async_session = sessionmaker(engine_test, expire_on_commit=False, class_=AsyncSession)
+
+
+async def override_get_session():
+    async with test_async_session() as session:
+        yield session
+
+app.dependency_overrides[get_session] = override_get_session
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -16,10 +46,19 @@ def event_loop():
     loop.close()
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="session")
 async def get_app():
     async with AsyncClient(app=app, base_url="http://127.0.0.1") as client:
         yield client
+
+
+@pytest_asyncio.fixture(autouse=True, scope="session")
+async def prepare_database():
+    async with engine_test.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    async with engine_test.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
 
 
 @pytest.mark.asyncio
@@ -28,14 +67,10 @@ class TestsEndpoints:
         response = await get_app.get("/events/")
         assert response.status_code == status.HTTP_200_OK
 
-    async def test_smoke_get_event_by_id(self, get_app):
-        response = await get_app.get("/events/6/")
-        assert response.status_code == status.HTTP_200_OK
-
     async def test_smoke_post_event(self, get_app):
         data = {
             "title": "string",
-            "description": "string",
+            "description": "TEST DESCRIPTION",
             "is_active": True,
             "created_at": str(datetime.now(timezone.utc)),
             "coordinates": "string",
@@ -45,6 +80,10 @@ class TestsEndpoints:
         headers = {"Content-Type": "application/json"}
         response = await get_app.post("/events/", json=data, headers=headers)
         assert response.status_code == status.HTTP_201_CREATED
+
+    async def test_smoke_get_event_by_id(self, get_app):
+        response = await get_app.get("/events/1/")
+        assert response.status_code == status.HTTP_200_OK
 
     async def test_smoke_delete_event(self, get_app):
         response = await get_app.delete("/events/1/")

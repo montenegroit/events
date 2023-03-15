@@ -1,6 +1,6 @@
 import os
 
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, select
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, MetaData
 from sqlalchemy.sql import func, text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
@@ -19,7 +19,6 @@ db_host = os.environ.get("db_host")
 db_port = os.environ.get("db_port")
 db_user = os.environ.get("db_user")
 db_pass = os.environ.get("db_pass")
-
 
 SQLALCHEMY_DATABASE_URL = (
     f"postgresql+asyncpg://{db_user}:{db_pass}@{db_host}/{db_name}"

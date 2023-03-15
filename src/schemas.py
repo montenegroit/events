@@ -2,7 +2,7 @@ import datetime
 from typing import Optional
 from datetime import datetime
 
-from pydantic import BaseModel, Field, constr
+from pydantic import BaseModel, Field
 
 
 class EventBase(BaseModel):

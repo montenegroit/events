@@ -72,10 +72,10 @@ class TestsEndpoints:
             "title": "string",
             "description": "TEST DESCRIPTION",
             "is_active": True,
-            "created_at": str(datetime.now(timezone.utc)),
+            "created_at": str(datetime.now(tz=None)),
             "coordinates": "string",
-            "start_at": str(datetime.now(timezone.utc)),
-            "end_at": str(datetime.now(timezone.utc)),
+            "start_at": str(datetime.now(tz=None)),
+            "end_at": str(datetime.now(tz=None)),
         }
         headers = {"Content-Type": "application/json"}
         response = await get_app.post("/events/", json=data, headers=headers)
@@ -94,11 +94,11 @@ class TestsEndpoints:
             "title": "string",
             "description": "PUT TESTS",
             "is_active": True,
-            "created_at": str(datetime.now(timezone.utc)),
+            "created_at": str(datetime.now(tz=None)),
             "coordinates": "string",
-            "start_at": str(datetime.now(timezone.utc)),
-            "end_at": str(datetime.now(timezone.utc)),
-            "updated_at": str(datetime.now(timezone.utc)),
+            "start_at": str(datetime.now(tz=None)),
+            "end_at": str(datetime.now(tz=None)),
+            "updated_at": str(datetime.now(tz=None)),
         }
         headers = {"Content-Type": "application/json"}
         response = await get_app.put("/events/6/", json=data, headers=headers)

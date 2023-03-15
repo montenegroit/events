@@ -20,7 +20,7 @@ jobs:
 
       - name: Black check & application tests
         run: |
-          python -m black .
+          python -m black --check .
           cd src/
           python -m pytest
 

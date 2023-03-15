@@ -6,7 +6,7 @@ import pytest_asyncio
 
 from httpx import AsyncClient
 from fastapi import status
-from datetime import datetime, timezone
+from datetime import datetime
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -29,12 +29,15 @@ SQLALCHEMY_DATABASE_URL_TEST = (
     f"postgresql+asyncpg://{test_db_user}:{test_db_pass}@{test_db_host}/{test_db_name}"
 )
 engine_test = create_async_engine(SQLALCHEMY_DATABASE_URL_TEST, echo=False)
-test_async_session = sessionmaker(engine_test, expire_on_commit=False, class_=AsyncSession)
+test_async_session = sessionmaker(
+    engine_test, expire_on_commit=False, class_=AsyncSession
+)
 
 
 async def override_get_session():
     async with test_async_session() as session:
         yield session
+
 
 app.dependency_overrides[get_session] = override_get_session
 

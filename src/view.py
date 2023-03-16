@@ -1,10 +1,12 @@
 from fastapi import APIRouter, status, Depends, Response
 from fastapi_pagination import paginate, Page
+from fastapi import HTTPException
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.schemas import EventBase, UpdateEvent, Event
-from src.models import Events, get_session
+from src.models import Events
+from src.db import get_session
 
 
 router = APIRouter(
@@ -20,7 +22,7 @@ async def get_event_by_id(
     result = await Events.get_event(event_id=event_id, session=session)
     if result:
         return result
-    return Response(status_code=status.HTTP_400_BAD_REQUEST)
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
 
 @router.get("/", response_model=Page[Event])

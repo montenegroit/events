@@ -1,5 +1,3 @@
-import os
-
 import asyncio
 import pytest
 import pytest_asyncio
@@ -11,18 +9,8 @@ from datetime import datetime
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
-from src.main import app
-from src.models import get_session, Base
-
-from dotenv import load_dotenv
-
-load_dotenv()
-
-test_db_name = os.environ.get("test_db_name")
-test_db_host = os.environ.get("test_db_host")
-test_db_port = os.environ.get("test_db_port")
-test_db_user = os.environ.get("test_db_user")
-test_db_pass = os.environ.get("test_db_pass")
+from src.config import app, test_db_name, test_db_host, test_db_port, test_db_user, test_db_pass
+from src.db import get_session, Base
 
 
 SQLALCHEMY_DATABASE_URL_TEST = (
@@ -88,10 +76,6 @@ class TestsEndpoints:
         response = await get_app.get("/events/1/")
         assert response.status_code == status.HTTP_200_OK
 
-    async def test_smoke_delete_event(self, get_app):
-        response = await get_app.delete("/events/1/")
-        assert response.status_code == status.HTTP_204_NO_CONTENT
-
     async def test_smoke_put_request_event(self, get_app):
         data = {
             "title": "string",
@@ -105,4 +89,8 @@ class TestsEndpoints:
         }
         headers = {"Content-Type": "application/json"}
         response = await get_app.put("/events/6/", json=data, headers=headers)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    async def test_smoke_delete_event(self, get_app):
+        response = await get_app.delete("/events/1/")
         assert response.status_code == status.HTTP_204_NO_CONTENT

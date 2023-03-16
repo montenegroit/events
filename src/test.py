@@ -26,7 +26,7 @@ test_db_pass = os.environ.get("test_db_pass")
 
 
 SQLALCHEMY_DATABASE_URL_TEST = (
-    f"postgresql+asyncpg://{test_db_user}:{test_db_pass}@{test_db_host}/{test_db_name}"
+    f"postgresql+asyncpg://{test_db_user}:{test_db_pass}@{test_db_host}:{test_db_port}/{test_db_name}"
 )
 engine_test = create_async_engine(SQLALCHEMY_DATABASE_URL_TEST, echo=False)
 test_async_session = sessionmaker(
@@ -51,7 +51,7 @@ def event_loop():
 
 @pytest_asyncio.fixture(scope="session")
 async def get_app():
-    async with AsyncClient(app=app, base_url="http://127.0.0.1") as client:
+    async with AsyncClient(app=app, base_url="http://test") as client:
         yield client
 
 

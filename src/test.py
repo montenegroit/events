@@ -8,9 +8,9 @@ from datetime import datetime
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+from src.main import app
 
 from src.config import (
-    app,
     test_db_name,
     test_db_host,
     test_db_port,
@@ -48,7 +48,10 @@ async def get_app():
         yield client
 
 
-@pytest_asyncio.fixture(autouse=True, scope="session")
+@pytest_asyncio.fixture(
+    autouse=True,
+    scope="session",
+)
 async def prepare_database():
     async with engine_test.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -59,11 +62,17 @@ async def prepare_database():
 
 @pytest.mark.asyncio
 class TestsEndpoints:
-    async def test_smoke_get_events(self, get_app):
+    async def test_smoke_get_events(
+        self,
+        get_app,
+    ):
         response = await get_app.get("/events/")
         assert response.status_code == status.HTTP_200_OK
 
-    async def test_smoke_post_event(self, get_app):
+    async def test_smoke_post_event(
+        self,
+        get_app,
+    ):
         data = {
             "title": "string",
             "description": "TEST DESCRIPTION",
@@ -74,14 +83,24 @@ class TestsEndpoints:
             "end_at": str(datetime.now(tz=None)),
         }
         headers = {"Content-Type": "application/json"}
-        response = await get_app.post("/events/", json=data, headers=headers)
+        response = await get_app.post(
+            "/events/",
+            json=data,
+            headers=headers,
+        )
         assert response.status_code == status.HTTP_201_CREATED
 
-    async def test_smoke_get_event_by_id(self, get_app):
+    async def test_smoke_get_event_by_id(
+        self,
+        get_app,
+    ):
         response = await get_app.get("/events/1/")
         assert response.status_code == status.HTTP_200_OK
 
-    async def test_smoke_put_request_event(self, get_app):
+    async def test_smoke_put_request_event(
+        self,
+        get_app,
+    ):
         data = {
             "title": "string",
             "description": "PUT TESTS",
@@ -93,9 +112,16 @@ class TestsEndpoints:
             "updated_at": str(datetime.now(tz=None)),
         }
         headers = {"Content-Type": "application/json"}
-        response = await get_app.put("/events/6/", json=data, headers=headers)
+        response = await get_app.put(
+            "/events/1/",
+            json=data,
+            headers=headers,
+        )
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
-    async def test_smoke_delete_event(self, get_app):
+    async def test_smoke_delete_event(
+        self,
+        get_app,
+    ):
         response = await get_app.delete("/events/1/")
         assert response.status_code == status.HTTP_204_NO_CONTENT

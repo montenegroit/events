@@ -4,7 +4,7 @@ from fastapi import HTTPException
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.schemas import EventBase, UpdateEvent, Event, Test
+from src.schemas import EventBase, UpdateEvent, Event
 from src.models import Events
 from src.db import get_session
 
@@ -17,7 +17,8 @@ router = APIRouter(
 
 @router.get("/{event_id}/")
 async def get_event_by_id(
-    event_id: int, session: AsyncSession = Depends(get_session)
+    event_id: int,
+    session: AsyncSession = Depends(get_session),
 ) -> Event:
     result = await Events.get_event(event_id=event_id, session=session)
     if result:
@@ -25,7 +26,10 @@ async def get_event_by_id(
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
 
-@router.get("/", response_model=Page[Event])
+@router.get(
+    "/",
+    response_model=Page[Event],
+)
 async def get_events(session: AsyncSession = Depends(get_session)):
     return paginate(await Events.get_all_events(session=session))
 
@@ -34,11 +38,17 @@ async def get_events(session: AsyncSession = Depends(get_session)):
     "/",
     status_code=status.HTTP_201_CREATED,
 )
-async def insert_event(event: EventBase, session: AsyncSession = Depends(get_session)):
+async def insert_event(
+    event: EventBase,
+    session: AsyncSession = Depends(get_session),
+):
     return await Events.add_event(event=event, session=session)
 
 
-@router.put("/{event_id}/", status_code=status.HTTP_204_NO_CONTENT)
+@router.put(
+    "/{event_id}/",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def put_event(
     event_id: int,
     update_data: UpdateEvent,
@@ -49,8 +59,12 @@ async def put_event(
     )
 
 
-@router.delete("/{event_id}/", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{event_id}/",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def delete_event_by_id(
-    event_id: int, session: AsyncSession = Depends(get_session)
+    event_id: int,
+    session: AsyncSession = Depends(get_session),
 ):
     return await Events.delete_event(event_id, session)

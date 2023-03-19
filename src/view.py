@@ -4,7 +4,7 @@ from fastapi import HTTPException
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.schemas import EventBase, UpdateEvent, Event
+from src.schemas import EventBase, UpdateEvent, Event, Test
 from src.models import Events
 from src.db import get_session
 

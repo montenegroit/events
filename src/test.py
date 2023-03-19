@@ -9,13 +9,18 @@ from datetime import datetime
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
-from src.config import app, test_db_name, test_db_host, test_db_port, test_db_user, test_db_pass
+from src.config import (
+    app,
+    test_db_name,
+    test_db_host,
+    test_db_port,
+    test_db_user,
+    test_db_pass,
+)
 from src.db import get_session, Base
 
 
-SQLALCHEMY_DATABASE_URL_TEST = (
-    f"postgresql+asyncpg://{test_db_user}:{test_db_pass}@{test_db_host}:{test_db_port}/{test_db_name}"
-)
+SQLALCHEMY_DATABASE_URL_TEST = f"postgresql+asyncpg://{test_db_user}:{test_db_pass}@{test_db_host}:{test_db_port}/{test_db_name}"
 engine_test = create_async_engine(SQLALCHEMY_DATABASE_URL_TEST, echo=False)
 test_async_session = sessionmaker(
     engine_test, expire_on_commit=False, class_=AsyncSession

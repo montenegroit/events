@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi_pagination import add_pagination
 
-from . import view
+import view
 
 
 app = FastAPI(

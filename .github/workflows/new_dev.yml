@@ -42,7 +42,7 @@ jobs:
       - name: Push Docker Image
         uses: elgohr/Publish-Docker-Github-Action@v4
         with:
-          name: etozhefifan/events
+          name: montenegroit/events
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io

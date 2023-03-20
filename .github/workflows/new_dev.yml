@@ -5,15 +5,6 @@ on: [push]
 jobs:
   tests:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:14.7
-        env:
-          POSTGRES_USER: ${{ secrets.test_db_user }}
-          POSTGRES_PASSWORD: ${{ secrets.test_db_pass }}
-          POSTGRES_DB: ${{ secrets.test_db_name }}
-        ports:
-         - 5432:5432
     steps:
       - uses: actions/checkout@v2
       - name: Install python
@@ -27,13 +18,6 @@ jobs:
           pip install black
           pip install -r requirements.txt
       - name: Black check & app tests
-        env:
-          test_db_port: ${{ secrets.test_db_port }}
-          test_db_host: ${{ secrets.test_db_host }}
-          test_db_user: ${{ secrets.test_db_user }}
-          test_db_pass: ${{ secrets.test_db_pass }}
-          test_db_base: ${{ secrets.test_db_base }}
-          test_db_name: ${{ secrets.test_db_name }}
         run: |
           python -m black --check .
           cd src/

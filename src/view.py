@@ -68,3 +68,7 @@ async def delete_event_by_id(
     session: AsyncSession = Depends(get_session),
 ):
     return await Events.delete_event(event_id, session)
+
+@router.get("/sentrytest")
+async def zerodivisonerror():
+    zero_division = 1/0

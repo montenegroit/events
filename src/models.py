@@ -2,7 +2,10 @@ from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP
 from sqlalchemy.sql import func, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import (
-    IntegrityError, OperationalError, DatabaseError, InternalError
+    IntegrityError,
+    OperationalError,
+    DatabaseError,
+    InternalError,
 )
 
 import src.schemas as event_schemas

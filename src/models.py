@@ -1,8 +1,9 @@
 from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP
 from sqlalchemy.sql import func, text
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import (
+    IntegrityError, OperationalError, DatabaseError, InternalError
+)
 
 import src.schemas as event_schemas
 
@@ -43,7 +44,11 @@ class Events(Base):
         query = text("SELECT * FROM events WHERE id=:event_id").bindparams(
             event_id=event_id
         )
-        row = await session.execute(query)
+        try:
+            row = await session.execute(query)
+        except (OperationalError, DatabaseError, InternalError) as e:
+            logger.error(e)
+            return await session.rollback()
         result = row.fetchone()
         if result:
             return result._asdict()

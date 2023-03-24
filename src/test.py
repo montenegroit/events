@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
 from src.main import app
-from src.schemas import TestSettings
+from src.schemas import TestSettings, Event
 from src.db import get_session, Base
 
 
@@ -83,6 +83,7 @@ class TestsEndpoints:
             headers=headers,
         )
         assert response.status_code == status.HTTP_201_CREATED
+        assert Event.parse_obj(response.json())
 
     async def test_smoke_get_event_by_id(
         self,
@@ -111,7 +112,8 @@ class TestsEndpoints:
             json=data,
             headers=headers,
         )
-        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.status_code == status.HTTP_200_OK
+        assert Event.parse_obj(response.json())
 
     async def test_smoke_delete_event(
         self,

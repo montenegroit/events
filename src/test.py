@@ -2,19 +2,19 @@ import asyncio
 import pytest
 import pytest_asyncio
 
+from datetime import datetime
 from httpx import AsyncClient
 from fastapi import status
-from datetime import datetime
-
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from src.main import app
-from src.schemas import settings
 
+from src.main import app
+from src.schemas import TestSettings
 from src.db import get_session, Base
 
 
-SQLALCHEMY_DATABASE_URL_TEST = f"postgresql+asyncpg://{settings.test_db_user}:{settings.test_db_pass}@{settings.test_db_host}:{settings.test_db_port}/{settings.test_db_name}"
+test_settings = TestSettings()
+SQLALCHEMY_DATABASE_URL_TEST = f"postgresql+asyncpg://{test_settings.test_db_user}:{test_settings.test_db_pass}@{test_settings.test_db_host}:{test_settings.test_db_port}/{test_settings.test_db_name}"
 engine_test = create_async_engine(SQLALCHEMY_DATABASE_URL_TEST, echo=False)
 test_async_session = sessionmaker(
     engine_test, expire_on_commit=False, class_=AsyncSession

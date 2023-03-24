@@ -1,3 +1,6 @@
+from typing import Dict, List
+from datetime import datetime
+
 from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP
 from sqlalchemy.sql import func, text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,18 +35,17 @@ class Events(Base):
     updated_at = Column(TIMESTAMP(timezone=False), onupdate=func.now())
 
     @staticmethod
-    async def get_all_events(session: AsyncSession):
+    async def get_all_events(session: AsyncSession) -> List:
         query = text("""SELECT * FROM events""")
         result = await session.execute(query)
         rows = result.fetchall()
         try:
             return [row._asdict() for row in rows]
-        except Exception as e:
+        except (OperationalError, DatabaseError, InternalError) as e:
             logger.error(e)
-            return await session.rollback()
 
     @staticmethod
-    async def get_event(event_id: int, session: AsyncSession):
+    async def get_event(event_id: int, session: AsyncSession) -> event_schemas.Event:
         query = text("SELECT * FROM events WHERE id=:event_id").bindparams(
             event_id=event_id
         )
@@ -51,11 +53,9 @@ class Events(Base):
             row = await session.execute(query)
         except (OperationalError, DatabaseError, InternalError) as e:
             logger.error(e)
-            return await session.rollback()
         result = row.fetchone()
         if result:
             return result._asdict()
-        return await session.rollback()
 
     @staticmethod
     async def add_event(event: event_schemas.EventBase, session: AsyncSession):
@@ -68,18 +68,26 @@ class Events(Base):
         )
         try:
             await session.execute(query, event.dict())
+            await session.commit()
+            return await Events._get_event_by_timestamp(
+                created_at=event.created_at,
+                session=session,
+            )
         except IntegrityError as e:
             logger.error(e)
             await session.rollback()
-        return await session.commit()
 
     @staticmethod
     async def delete_event(event_id: int, session: AsyncSession):
         query = text("""DELETE FROM events WHERE id=:event_id""").bindparams(
             event_id=event_id
         )
-        await session.execute(query)
-        return await session.commit()
+        try:
+            await session.execute(query)
+            return await session.commit()
+        except (OperationalError, DatabaseError, InternalError) as e:
+            logger.error(e)
+            await session.rollback()
 
     @staticmethod
     async def update_event(
@@ -93,7 +101,9 @@ class Events(Base):
             SET title=:title,
                 description=:description,
                 coordinates=:coordinates,
-                start_at=:start_at, end_at=:end_at,
+                is_active=:is_active,
+                start_at=:start_at,
+                end_at=:end_at,
                 created_at=:created_at,
                 updated_at=:updated_at
             WHERE id=:event_id
@@ -101,7 +111,21 @@ class Events(Base):
         ).bindparams(event_id=event_id)
         try:
             await session.execute(query, update_data.dict())
+            await session.commit()
+            result = await Events.get_event(event_id=event_id, session=session)
+            return result
         except IntegrityError as e:
             logger.error(e)
             await session.rollback()
-        return await session.commit()
+
+    @staticmethod
+    async def _get_event_by_timestamp(
+        created_at: datetime,
+        session: AsyncSession,
+    ) -> event_schemas.Event:
+        select_query = text(
+            "SELECT * FROM events WHERE created_at=:created_at"
+        ).bindparams(created_at=created_at)
+        row = await session.execute(select_query)
+        result = row.fetchone()
+        return result._asdict()

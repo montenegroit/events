@@ -11,7 +11,7 @@ from src.db import get_session
 
 router = APIRouter(
     tags=["Events"],
-    prefix="/events",
+    prefix="/event",
 )
 
 
@@ -28,9 +28,10 @@ async def get_event_by_id(
 
 @router.get(
     "/",
+    status_code=status.HTTP_200_OK,
     response_model=Page[Event],
 )
-async def get_events(session: AsyncSession = Depends(get_session)):
+async def get_events(session: AsyncSession = Depends(get_session)) -> Page[Event]:
     return paginate(await Events.get_all_events(session=session))
 
 
@@ -47,13 +48,13 @@ async def insert_event(
 
 @router.put(
     "/{event_id}/",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=status.HTTP_200_OK,
 )
 async def put_event(
     event_id: int,
     update_data: UpdateEvent,
     session: AsyncSession = Depends(get_session),
-):
+) -> Event:
     return await Events.update_event(
         event_id=event_id, update_data=update_data, session=session
     )

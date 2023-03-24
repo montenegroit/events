@@ -29,7 +29,10 @@ class Settings(BaseSettings):
     db_user: str = "events"
     db_pass: str = "events"
     db_name: str = "events"
+    sentry_sdk: str = "https://0f3c1cc149a0488e9c57e5c7ef692697@o4504875436539904.ingest.sentry.io/4504875437588480"
 
+
+class TestSettings(BaseSettings):
     test_db_host: str = "localhost"
     test_db_port: int = 5432
     test_db_user: str = "postgres"
@@ -37,4 +40,5 @@ class Settings(BaseSettings):
     test_db_name: str = "postgres"
 
 
-settings = Settings()
+DEBUG = False
+settings = Settings() if DEBUG is False else TestSettings()

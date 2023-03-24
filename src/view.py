@@ -11,7 +11,7 @@ from src.db import get_session
 
 router = APIRouter(
     tags=["Events"],
-    prefix="/event",
+    prefix="/events",
 )
 
 

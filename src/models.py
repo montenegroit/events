@@ -1,5 +1,7 @@
-from typing import Dict, List
+from typing import List
 from datetime import datetime
+
+from fastapi import HTTPException
 
 from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP
 from sqlalchemy.sql import func, text
@@ -43,6 +45,7 @@ class Events(Base):
             return [row._asdict() for row in rows]
         except (OperationalError, DatabaseError, InternalError) as e:
             logger.error(e)
+            raise HTTPException(status_code=422, detail="Data is not valid")
 
     @staticmethod
     async def get_event(event_id: int, session: AsyncSession) -> event_schemas.Event:
@@ -53,6 +56,7 @@ class Events(Base):
             row = await session.execute(query)
         except (OperationalError, DatabaseError, InternalError) as e:
             logger.error(e)
+            raise HTTPException(status_code=422, detail="Data is not valid")
         result = row.fetchone()
         if result:
             return result._asdict()
@@ -76,6 +80,7 @@ class Events(Base):
         except IntegrityError as e:
             logger.error(e)
             await session.rollback()
+            raise HTTPException(status_code=422, detail="Data is not valid.")
 
     @staticmethod
     async def delete_event(event_id: int, session: AsyncSession):
@@ -88,6 +93,7 @@ class Events(Base):
         except (OperationalError, DatabaseError, InternalError) as e:
             logger.error(e)
             await session.rollback()
+            raise HTTPException(status_code=422, detail="Data is not valid")
 
     @staticmethod
     async def update_event(
@@ -117,6 +123,7 @@ class Events(Base):
         except IntegrityError as e:
             logger.error(e)
             await session.rollback()
+            raise HTTPException(status_code=422, detail="Data is not valid")
 
     @staticmethod
     async def _get_event_by_timestamp(

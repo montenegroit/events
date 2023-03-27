@@ -1,10 +1,6 @@
 name: Tests and Linter check
 
-on:
-  push:
-    branches:
-      - "new_dev"
-      - "main"
+on: [push]
 
 jobs:
   tests:

@@ -6,6 +6,7 @@ from sqlalchemy import pool
 
 from alembic import context
 from src.models import Base
+from src.schemas import settings
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,11 +20,11 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 section = config.config_ini_section
-config.set_section_option(section, "db_user", os.environ.get("db_user"))
-config.set_section_option(section, "db_pass", os.environ.get("db_pass"))
-config.set_section_option(section, "db_host", os.environ.get("db_host"))
-config.set_section_option(section, "db_name", os.environ.get("db_name"))
-config.set_section_option(section, "db_port", os.environ.get("db_port"))
+config.set_section_option(section, "db_user", settings.db_user)
+config.set_section_option(section, "db_pass", settings.db_pass)
+config.set_section_option(section, "db_host", settings.db_host)
+config.set_section_option(section, "db_name", settings.db_pass)
+config.set_section_option(section, "db_port", str(settings.db_port))
 
 # add your model's MetaData object here
 # for 'autogenerate' support

@@ -24,7 +24,7 @@ class Event(EventBase):
 
 
 class Settings(BaseSettings):
-    db_host: str = "db"
+    db_host: str = "localhost"
     db_port: int = 5432
     db_user: str = "events"
     db_pass: str = "events"
@@ -33,7 +33,7 @@ class Settings(BaseSettings):
 
 
 class TestSettings(BaseSettings):
-    test_db_host: str = "db"
+    test_db_host: str = "localhost"
     test_db_port: int = 5432
     test_db_user: str = "postgres"
     test_db_pass: str = "postgres"

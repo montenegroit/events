@@ -10,7 +10,8 @@ from sqlalchemy.orm import sessionmaker
 
 from src.main import app
 from src.schemas import TestSettings, Event
-from src.db import get_session, Base
+from src.db import get_session
+from src.models import Base
 
 
 test_settings = TestSettings()

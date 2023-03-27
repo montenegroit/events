@@ -12,11 +12,14 @@ from sqlalchemy.exc import (
     DatabaseError,
     InternalError,
 )
+from sqlalchemy.orm import declarative_base
 
 import src.schemas as event_schemas
 
 from src.logger import logger
-from src.db import Base
+
+
+Base = declarative_base()
 
 
 class Events(Base):

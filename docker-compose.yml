@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+
+  api:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    command: sh -c "uvicorn src.main:app --host 0.0.0.0 --port 8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+    - 8000:8000
+
+  db:
+    image: postgres:13.8-bullseye
+    hostname: events-db
+    environment:
+      POSTGRES_PASSWORD: "events"
+      POSTGRES_USER: "events"
+      POSTGRES_DB: "events"
+    volumes:
+    - events-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: pg_isready -U events
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+
+volumes:
+  events-db-data:
+    name: events-db-data

@@ -1,10 +1,11 @@
+import uvicorn
 import sentry_sdk
 
 from fastapi import FastAPI
 from fastapi_pagination import add_pagination
 from dotenv import load_dotenv
 
-from . import view
+from src import view
 from src.schemas import settings
 
 load_dotenv()
@@ -22,3 +23,11 @@ app = FastAPI(
 app.include_router(view.router)
 
 add_pagination(app)
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        app,
+        host="localhost",
+        port=8000,
+    )

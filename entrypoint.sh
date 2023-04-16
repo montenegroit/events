@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/bin/bash
+source .env
 
 if [[ ${db_host} ]]; then
     export PGPASSWORD=${db_pass}

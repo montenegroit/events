@@ -61,7 +61,10 @@ class TestsEndpoints:
         self,
         get_app,
     ):
-        response = await get_app.get("/events/")
+        headers = {
+            "Authorization": "Bearer testKey",
+        }
+        response = await get_app.get("/events/", headers=headers)
         assert response.status_code == status.HTTP_200_OK
 
     async def test_smoke_post_event(
@@ -77,7 +80,10 @@ class TestsEndpoints:
             "start_at": str(datetime.now(tz=None)),
             "end_at": str(datetime.now(tz=None)),
         }
-        headers = {"Content-Type": "application/json"}
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer testKey",
+        }
         response = await get_app.post(
             "/events/",
             json=data,
@@ -90,7 +96,10 @@ class TestsEndpoints:
         self,
         get_app,
     ):
-        response = await get_app.get("/events/1/")
+        headers = {
+            "Authorization": "Bearer testKey",
+        }
+        response = await get_app.get("/events/1/", headers=headers)
         assert response.status_code == status.HTTP_200_OK
 
     async def test_smoke_put_request_event(
@@ -107,7 +116,10 @@ class TestsEndpoints:
             "end_at": str(datetime.now(tz=None)),
             "updated_at": str(datetime.now(tz=None)),
         }
-        headers = {"Content-Type": "application/json"}
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer testKey",
+        }
         response = await get_app.put(
             "/events/1/",
             json=data,
@@ -120,5 +132,25 @@ class TestsEndpoints:
         self,
         get_app,
     ):
-        response = await get_app.delete("/events/1/")
+        headers = {
+            "Authorization": "Bearer testKey",
+        }
+        response = await get_app.delete("/events/1/", headers=headers)
         assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    async def test_smoke_no_api_key(
+        self,
+        get_app,
+    ):
+        response = await get_app.get("/events/")
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    async def test_smoke_wrong_api_key(
+        self,
+        get_app,
+    ):
+        headers = {
+            "Authorization": "Bearer wrongkey",
+        }
+        response = await get_app.get("/events/", headers=headers)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED

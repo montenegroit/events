@@ -29,7 +29,10 @@ router = APIRouter(
 )
 
 
-@router.get("/{event_id}/", dependencies=[Depends(api_key_auth)],)
+@router.get(
+    "/{event_id}/",
+    dependencies=[Depends(api_key_auth)],
+)
 async def get_event_by_id(
     event_id: int,
     session: AsyncSession = Depends(get_session),

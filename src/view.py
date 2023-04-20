@@ -10,14 +10,14 @@ from src.db import get_session
 
 
 api_keys = {
-    "montenegroIT": "testKey",
+    "testKey": "montenegroIT",
 }
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="checktoken")
 
 
 def api_key_auth(api_key: str = Depends(oauth2_scheme)):
-    if api_key not in api_keys.values():
+    if api_key not in api_keys:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Wrong key"
         )
@@ -29,7 +29,7 @@ router = APIRouter(
 )
 
 
-@router.get("/{event_id}/", dependencies=[Depends(api_key_auth)])
+@router.get("/{event_id}/", dependencies=[Depends(api_key_auth)],)
 async def get_event_by_id(
     event_id: int,
     session: AsyncSession = Depends(get_session),

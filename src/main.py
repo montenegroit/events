@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi_pagination import add_pagination
 from dotenv import load_dotenv
 
-from . import view
+from src import view
 from src.schemas import settings
 
 load_dotenv()

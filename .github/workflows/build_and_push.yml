@@ -1,6 +1,6 @@
 name: Publish to Registry and pull image
 
-on: [push]
+on: [release]
 
 jobs:
   build_and_push_to_ghcr:
